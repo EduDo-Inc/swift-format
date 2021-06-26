@@ -48,7 +48,8 @@ extension SwiftFormatCommand {
       }
 
       let modeSupportsRecursive = mode == .format || mode == .lint
-      if lintFormatOptions.recursive && (!modeSupportsRecursive || lintFormatOptions.paths.isEmpty) {
+      if lintFormatOptions.recursive && (!modeSupportsRecursive || lintFormatOptions.paths.isEmpty)
+      {
         throw ValidationError("'--recursive' is only valid when formatting or linting files")
       }
     }

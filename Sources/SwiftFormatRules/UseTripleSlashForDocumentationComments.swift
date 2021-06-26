@@ -96,7 +96,8 @@ public final class UseTripleSlashForDocumentationComments: SyntaxFormatRule {
     }
 
     return !hasFoundDocComment
-      ? decl : replaceTrivia(
+      ? decl
+      : replaceTrivia(
         on: decl,
         token: decl.firstToken,
         leadingTrivia: Trivia(pieces: pieces.reversed())
@@ -109,7 +110,8 @@ public final class UseTripleSlashForDocumentationComments: SyntaxFormatRule {
     var pieces = [TriviaPiece]()
     for lineText in docComments.dropLast() {
       // Adds an space as indentation for the lines that needed it.
-      let docLineMark = lineText.first == " " || lineText.trimmingCharacters(in: .whitespaces) == ""
+      let docLineMark =
+        lineText.first == " " || lineText.trimmingCharacters(in: .whitespaces) == ""
         ? "///" : "/// "
       pieces.append(.docLineComment(docLineMark + lineText))
       pieces.append(.newlines(1))
@@ -117,8 +119,11 @@ public final class UseTripleSlashForDocumentationComments: SyntaxFormatRule {
 
     // The last piece doesn't need a newline after it.
     if docComments.last!.trimmingCharacters(in: .whitespaces) != "" {
-      let docLineMark = docComments.last!.first == " " || docComments.last!.trimmingCharacters(
-        in: .whitespaces) == "" ? "///" : "/// "
+      let docLineMark =
+        docComments.last!.first == " "
+          || docComments.last!.trimmingCharacters(
+            in: .whitespaces) == ""
+        ? "///" : "/// "
       pieces.append(.docLineComment(docLineMark + docComments.last!))
     }
     return pieces

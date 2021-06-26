@@ -15,7 +15,7 @@ import SwiftSyntax
 
 /// Rewriter that replaces the trivia of a given token inside a node with the provided
 /// leading/trailing trivia.
-fileprivate final class ReplaceTrivia: SyntaxRewriter {
+private final class ReplaceTrivia: SyntaxRewriter {
   private let leadingTrivia: Trivia?
   private let trailingTrivia: Trivia?
   private let token: TokenSyntax

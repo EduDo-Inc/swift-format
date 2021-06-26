@@ -139,7 +139,8 @@ public class PrettyPrinter {
   private var currentIndentation: [Indent] {
     let indentation = configuration.indentation
     var totalIndentation: [Indent] = activeOpenBreaks.flatMap { (open) -> [Indent] in
-      let count = (open.contributesBlockIndent ? 1 : 0)
+      let count =
+        (open.contributesBlockIndent ? 1 : 0)
         + (open.contributesContinuationIndent ? 1 : 0)
       return Array(repeating: indentation, count: count)
     }
@@ -290,7 +291,7 @@ public class PrettyPrinter {
     // the group.
     case .open(let breaktype):
       // Determine if the break tokens in this group need to be forced.
-      if (length > spaceRemaining || lastBreak), case .consistent = breaktype {
+      if length > spaceRemaining || lastBreak, case .consistent = breaktype {
         forceBreakStack.append(true)
       } else {
         forceBreakStack.append(false)
@@ -331,7 +332,8 @@ public class PrettyPrinter {
         // lines within it (unless they are themselves continuations within that particular
         // scope), so we need the continuation indentation to persist across all the lines in that
         // scope. Additionally, continuation open breaks must indent when the break fires.
-        let continuationBreakWillFire = openKind == .continuation
+        let continuationBreakWillFire =
+          openKind == .continuation
           && (isAtStartOfLine || length > spaceRemaining || mustBreak)
         let contributesContinuationIndent = currentLineIsContinuation || continuationBreakWillFire
 
@@ -355,8 +357,8 @@ public class PrettyPrinter {
           fatalError("Unmatched closing break")
         }
 
-        let openedOnDifferentLine
-          = openCloseBreakCompensatingLineNumber != matchingOpenBreak.lineNumber
+        let openedOnDifferentLine =
+          openCloseBreakCompensatingLineNumber != matchingOpenBreak.lineNumber
 
         if matchingOpenBreak.contributesBlockIndent {
           // The actual line number is used, instead of the compensating line number. When the close
@@ -407,12 +409,14 @@ public class PrettyPrinter {
           //
           // Likewise, we need to do this if we popped an old continuation state off the stack,
           // even if the break *doesn't* fire.
-          let matchingOpenBreakIndented = matchingOpenBreak.contributesContinuationIndent
+          let matchingOpenBreakIndented =
+            matchingOpenBreak.contributesContinuationIndent
             || matchingOpenBreak.contributesBlockIndent
           currentLineIsContinuation = matchingOpenBreakIndented && openedOnDifferentLine
         }
 
-        let wasContinuationWhenOpened = (continuationStack.popLast() ?? false)
+        let wasContinuationWhenOpened =
+          (continuationStack.popLast() ?? false)
           || matchingOpenBreak.contributesContinuationIndent
           // This ensures a continuation indent is propagated to following scope when an initial
           // scope would've indented if the leading break wasn't at the start of a line.

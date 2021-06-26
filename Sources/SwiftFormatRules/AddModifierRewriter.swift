@@ -13,7 +13,7 @@
 import SwiftFormatCore
 import SwiftSyntax
 
-fileprivate final class AddModifierRewriter: SyntaxRewriter {
+private final class AddModifierRewriter: SyntaxRewriter {
   private let modifierKeyword: DeclModifierSyntax
 
   init(modifierKeyword: DeclModifierSyntax) {

@@ -55,7 +55,9 @@ struct FileIterator: Sequence, IteratorProtocol {
           if isDir.boolValue {
             dirIterator = FileManager.default.enumerator(atPath: next)
             currentDirectory = URL(fileURLWithPath: next, isDirectory: true)
-          } else { output = next }
+          } else {
+            output = next
+          }
         } else {
           // If a path doesn't exist, allow it pass down into the SwiftFormat API so it can throw
           // the appropriate exception. We don't want to kill the entire process if this happens.
@@ -82,7 +84,9 @@ struct FileIterator: Sequence, IteratorProtocol {
             output = absoluteItemPath
           }
         }
-      } else { break }
+      } else {
+        break
+      }
     }
     // If we've exhausted the files in the directory recursion, unset the directory iterator.
     if output == nil { dirIterator = nil }

@@ -108,9 +108,10 @@ class Frontend {
 
   /// Processes source content from standard input.
   private func processStandardInput() {
-    guard let configuration = configuration(
-      atPath: lintFormatOptions.configurationPath,
-      orInferredFromSwiftFileAtPath: nil)
+    guard
+      let configuration = configuration(
+        atPath: lintFormatOptions.configurationPath,
+        orInferredFromSwiftFileAtPath: nil)
     else {
       // Already diagnosed in the called method.
       return
@@ -143,14 +144,15 @@ class Frontend {
   }
 
   /// Read and process the given path, optionally synchronizing diagnostic output.
-  private func openAndProcess(_ path: String) -> Void {
+  private func openAndProcess(_ path: String) {
     guard let sourceFile = FileHandle(forReadingAtPath: path) else {
       diagnosticEngine.diagnose(Diagnostic.Message(.error, "Unable to open \(path)"))
       return
     }
 
-    guard let configuration = configuration(
-      atPath: lintFormatOptions.configurationPath, orInferredFromSwiftFileAtPath: path)
+    guard
+      let configuration = configuration(
+        atPath: lintFormatOptions.configurationPath, orInferredFromSwiftFileAtPath: path)
     else {
       // Already diagnosed in the called method.
       return
@@ -201,8 +203,10 @@ class Frontend {
         // Fall through to the default return at the end of the function.
       } catch {
         diagnosticEngine.diagnose(
-          Diagnostic.Message(.error, "Unable to read configuration for \(swiftFilePath): "
-            + "\(error.localizedDescription)"))
+          Diagnostic.Message(
+            .error,
+            "Unable to read configuration for \(swiftFilePath): "
+              + "\(error.localizedDescription)"))
         return nil
       }
     }

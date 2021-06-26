@@ -29,12 +29,14 @@ public final class ValidateDocumentationComments: SyntaxLintRule {
 
   public override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
     return checkFunctionLikeDocumentation(
-      DeclSyntax(node), name: "init", parameters: node.parameters.parameterList, throwsOrRethrowsKeyword: node.throwsOrRethrowsKeyword)
+      DeclSyntax(node), name: "init", parameters: node.parameters.parameterList,
+      throwsOrRethrowsKeyword: node.throwsOrRethrowsKeyword)
   }
 
   public override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
     return checkFunctionLikeDocumentation(
-      DeclSyntax(node), name: node.identifier.text, parameters: node.signature.input.parameterList, throwsOrRethrowsKeyword: node.signature.throwsOrRethrowsKeyword,
+      DeclSyntax(node), name: node.identifier.text, parameters: node.signature.input.parameterList,
+      throwsOrRethrowsKeyword: node.signature.throwsOrRethrowsKeyword,
       returnClause: node.signature.output)
   }
 
@@ -51,8 +53,10 @@ public final class ValidateDocumentationComments: SyntaxLintRule {
 
     // If a single sentence summary is the only documentation, parameter(s) and
     // returns tags may be ommitted.
-    if commentInfo.oneSentenceSummary != nil && commentInfo.commentParagraphs!.isEmpty && params
-      .isEmpty && commentInfo.returnsDescription == nil
+    if commentInfo.oneSentenceSummary != nil && commentInfo.commentParagraphs!.isEmpty
+      && params
+        .isEmpty
+      && commentInfo.returnsDescription == nil
     {
       return .skipChildren
     }
@@ -82,8 +86,9 @@ public final class ValidateDocumentationComments: SyntaxLintRule {
 
     // Ensures that the parameters of the documantation and the function signature
     // are the same.
-    if (params.count != funcParameters.count) || !parametersAreEqual(
-      params: params, funcParam: funcParameters)
+    if (params.count != funcParameters.count)
+      || !parametersAreEqual(
+        params: params, funcParam: funcParameters)
     {
       diagnose(.parametersDontMatch(funcName: name), on: node)
     }
@@ -103,7 +108,7 @@ public final class ValidateDocumentationComments: SyntaxLintRule {
       diagnose(.removeReturnComment(funcName: name), on: node)
     } else if let returnClause = returnClause, returnDesc == nil {
       if let returnTypeIdentifier = returnClause.returnType.as(SimpleTypeIdentifierSyntax.self),
-         returnTypeIdentifier.name.text == "Never"
+        returnTypeIdentifier.name.text == "Never"
       {
         return
       }
@@ -134,7 +139,7 @@ public final class ValidateDocumentationComments: SyntaxLintRule {
 
 /// Iterates through every parameter of paramList and returns a list of the
 /// paramters identifiers.
-fileprivate func funcParametersIdentifiers(in paramList: FunctionParameterListSyntax) -> [String] {
+private func funcParametersIdentifiers(in paramList: FunctionParameterListSyntax) -> [String] {
   var funcParameters = [String]()
   for parameter in paramList {
     // If there is a label and an identifier, then the identifier (`secondName`) is the name that
@@ -150,7 +155,7 @@ fileprivate func funcParametersIdentifiers(in paramList: FunctionParameterListSy
 
 /// Indicates if the parameters name from the documentation and the parameters
 /// from the declaration are the same.
-fileprivate func parametersAreEqual(params: [ParseComment.Parameter], funcParam: [String]) -> Bool {
+private func parametersAreEqual(params: [ParseComment.Parameter], funcParam: [String]) -> Bool {
   for index in 0..<params.count {
     if params[index].name != funcParam[index] {
       return false

@@ -43,10 +43,11 @@ struct LintFormatOptions: ParsableArguments {
   /// treated as containing an error. When ignored, unparsable files are output verbatim in format
   /// mode and no diagnostics are raised in lint mode. When not ignored, unparsable files raise a
   /// diagnostic in both format and lint mode.
-  @Flag(help: """
-    Ignores unparsable files, disabling all diagnostics and formatting for files that contain \
-    invalid syntax.
-    """)
+  @Flag(
+    help: """
+      Ignores unparsable files, disabling all diagnostics and formatting for files that contain \
+      invalid syntax.
+      """)
   var ignoreUnparsableFiles: Bool = false
 
   /// Whether or not to run the formatter/linter in parallel.

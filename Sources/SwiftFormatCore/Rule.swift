@@ -27,16 +27,16 @@ public protocol Rule {
   init(context: Context)
 }
 
-fileprivate var nameCache = [ObjectIdentifier: String]()
-fileprivate var nameCacheQueue = DispatchQueue(
-      label: "com.apple.SwiftFormat.NameCache", attributes: .concurrent)
+private var nameCache = [ObjectIdentifier: String]()
+private var nameCacheQueue = DispatchQueue(
+  label: "com.apple.SwiftFormat.NameCache", attributes: .concurrent)
 
 extension Rule {
   /// By default, the `ruleName` is just the name of the implementing rule class.
   public static var ruleName: String {
     let identifier = ObjectIdentifier(self)
     let cachedName = nameCacheQueue.sync {
-        nameCache[identifier]
+      nameCache[identifier]
     }
 
     if let cachedName = cachedName {
@@ -45,7 +45,7 @@ extension Rule {
 
     let name = String("\(self)".split(separator: ".").last!)
     nameCacheQueue.async(flags: .barrier) {
-        nameCache[identifier] = name
+      nameCache[identifier] = name
     }
 
     return name

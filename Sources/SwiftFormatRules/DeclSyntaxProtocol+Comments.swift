@@ -42,7 +42,8 @@ extension DeclSyntaxProtocol {
             let numCharsToRemove = isTheFirstLine ? markToRemove.count : markToRemove.count - 1
             isTheFirstLine = false
             return trimmedLine.hasSuffix("*/")
-              ? String(trimmedLine.dropFirst(numCharsToRemove).dropLast(3)) : String(
+              ? String(trimmedLine.dropFirst(numCharsToRemove).dropLast(3))
+              : String(
                 trimmedLine.dropFirst(numCharsToRemove))
           } else if trimmedLine == "*" {
             return ""
@@ -148,10 +149,10 @@ extension DeclSyntaxProtocol {
 }
 
 private enum DocCommentSection {
-    case commentParagraphs
-    case parameters
-    case throwsDescription
-    case returnsDescription
+  case commentParagraphs
+  case parameters
+  case throwsDescription
+  case returnsDescription
 }
 
 struct ParseComment {

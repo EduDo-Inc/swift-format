@@ -51,8 +51,9 @@ public final class UseWhereClausesInForLoops: SyntaxFormatRule {
       )
       return StmtSyntax(result)
     case .guardStmt(let guardStmt)
-    where guardStmt.conditions.count == 1 && guardStmt.body.statements.count == 1 && guardStmt.body
-      .statements.first!.item.is(ContinueStmtSyntax.self):
+    where guardStmt.conditions.count == 1 && guardStmt.body.statements.count == 1
+      && guardStmt.body
+        .statements.first!.item.is(ContinueStmtSyntax.self):
       // Extract the condition of the GuardStmt.
       let conditionElement = guardStmt.conditions.first!
       guard let condition = conditionElement.condition.as(ExprSyntax.self) else {
@@ -71,7 +72,7 @@ public final class UseWhereClausesInForLoops: SyntaxFormatRule {
   }
 }
 
-fileprivate func updateWithWhereCondition(
+private func updateWithWhereCondition(
   node: ForInStmtSyntax,
   condition: ExprSyntax,
   statements: CodeBlockItemListSyntax

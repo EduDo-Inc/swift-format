@@ -91,7 +91,7 @@ extension SourceRange {
 /// The rule status comment directives implementation intentionally supports exactly the same nodes
 /// as `TokenStreamCreator` to disable pretty printing. This ensures ignore comments for pretty
 /// printing and for rules are as consistent as possible.
-fileprivate class RuleStatusCollectionVisitor: SyntaxVisitor {
+private class RuleStatusCollectionVisitor: SyntaxVisitor {
   /// Describes the possible matches for ignore directives, in comments.
   enum RuleStatusDirectiveMatch {
     /// There is a directive that applies to all rules.

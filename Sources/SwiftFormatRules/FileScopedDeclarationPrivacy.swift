@@ -46,52 +46,59 @@ public final class FileScopedDeclarationPrivacy: SyntaxFormatRule {
 
       case .functionDecl(let functionDecl):
         return codeBlockItem.withItem(
-          Syntax(rewrittenDecl(
-            functionDecl,
-            modifiers: functionDecl.modifiers,
-            factory: functionDecl.withModifiers)))
+          Syntax(
+            rewrittenDecl(
+              functionDecl,
+              modifiers: functionDecl.modifiers,
+              factory: functionDecl.withModifiers)))
 
       case .variableDecl(let variableDecl):
         return codeBlockItem.withItem(
-          Syntax(rewrittenDecl(
-            variableDecl,
-            modifiers: variableDecl.modifiers,
-            factory: variableDecl.withModifiers)))
+          Syntax(
+            rewrittenDecl(
+              variableDecl,
+              modifiers: variableDecl.modifiers,
+              factory: variableDecl.withModifiers)))
 
       case .classDecl(let classDecl):
         return codeBlockItem.withItem(
-          Syntax(rewrittenDecl(
-            classDecl,
-            modifiers: classDecl.modifiers,
-            factory: classDecl.withModifiers)))
+          Syntax(
+            rewrittenDecl(
+              classDecl,
+              modifiers: classDecl.modifiers,
+              factory: classDecl.withModifiers)))
 
       case .structDecl(let structDecl):
         return codeBlockItem.withItem(
-          Syntax(rewrittenDecl(
-            structDecl,
-            modifiers: structDecl.modifiers,
-            factory: structDecl.withModifiers)))
+          Syntax(
+            rewrittenDecl(
+              structDecl,
+              modifiers: structDecl.modifiers,
+              factory: structDecl.withModifiers)))
 
       case .enumDecl(let enumDecl):
         return codeBlockItem.withItem(
-          Syntax(rewrittenDecl(
-            enumDecl,
-            modifiers: enumDecl.modifiers,
-            factory: enumDecl.withModifiers)))
+          Syntax(
+            rewrittenDecl(
+              enumDecl,
+              modifiers: enumDecl.modifiers,
+              factory: enumDecl.withModifiers)))
 
       case .protocolDecl(let protocolDecl):
         return codeBlockItem.withItem(
-          Syntax(rewrittenDecl(
-            protocolDecl,
-            modifiers: protocolDecl.modifiers,
-            factory: protocolDecl.withModifiers)))
+          Syntax(
+            rewrittenDecl(
+              protocolDecl,
+              modifiers: protocolDecl.modifiers,
+              factory: protocolDecl.withModifiers)))
 
       case .typealiasDecl(let typealiasDecl):
         return codeBlockItem.withItem(
-          Syntax(rewrittenDecl(
-            typealiasDecl,
-            modifiers: typealiasDecl.modifiers,
-            factory: typealiasDecl.withModifiers)))
+          Syntax(
+            rewrittenDecl(
+              typealiasDecl,
+              modifiers: typealiasDecl.modifiers,
+              factory: typealiasDecl.withModifiers)))
 
       default:
         return codeBlockItem

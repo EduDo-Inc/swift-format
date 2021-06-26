@@ -25,8 +25,8 @@ public final class NoEmptyTrailingClosureParentheses: SyntaxFormatRule {
     guard node.argumentList.count == 0 else { return super.visit(node) }
 
     guard let trailingClosure = node.trailingClosure,
-      node.argumentList.isEmpty && node.leftParen != nil else
-    {
+      node.argumentList.isEmpty && node.leftParen != nil
+    else {
       return super.visit(node)
     }
     guard let name = node.calledExpression.lastToken?.withoutTrivia() else {

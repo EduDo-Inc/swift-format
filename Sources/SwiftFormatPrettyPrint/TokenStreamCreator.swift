@@ -17,7 +17,7 @@ import SwiftSyntax
 
 /// Visits the nodes of a syntax tree and constructs a linear stream of formatting tokens that
 /// tell the pretty printer how the source text should be laid out.
-fileprivate final class TokenStreamCreator: SyntaxVisitor {
+private final class TokenStreamCreator: SyntaxVisitor {
   private var tokens = [Token]()
   private var beforeMap = [TokenSyntax: [Token]]()
   private var afterMap = [TokenSyntax: [[Token]]]()
@@ -253,7 +253,8 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
       after(members.leftBrace, tokens: .close)
     }
 
-    let lastTokenBeforeBrace = inheritanceClause?.colon ?? genericParameterClause?.rightAngleBracket
+    let lastTokenBeforeBrace =
+      inheritanceClause?.colon ?? genericParameterClause?.rightAngleBracket
       ?? identifier
     after(lastTokenBeforeBrace, tokens: .close)
 
@@ -492,7 +493,8 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
       }
     }
 
-    arrangeBracesAndContents(of: node.elseBody?.as(CodeBlockSyntax.self), contentsKeyPath: \.statements)
+    arrangeBracesAndContents(
+      of: node.elseBody?.as(CodeBlockSyntax.self), contentsKeyPath: \.statements)
 
     return .visitChildren
   }
@@ -585,7 +587,8 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
   }
 
   override func visit(_ node: CatchClauseSyntax) -> SyntaxVisitorContinueKind {
-    let catchPrecedingBreak = config.lineBreakBeforeControlFlowKeywords
+    let catchPrecedingBreak =
+      config.lineBreakBeforeControlFlowKeywords
       ? Token.break(.same, newlines: .soft) : Token.space
     before(node.catchKeyword, tokens: catchPrecedingBreak)
 
@@ -915,15 +918,24 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
       (node.trailingClosure != nil && !isCompactSingleFunctionCallArgument(arguments))
       || mustBreakBeforeClosingDelimiter(of: node, argumentListPath: \.argumentList)
 
-    before(
-      node.trailingClosure?.leftBrace,
-      tokens: .break(.same, newlines: .elective(ignoresDiscretionary: true)))
+    if config.respectsCompactFunctions, node.trailingClosure?.startsWithImpicitArgument == true {
+      before(
+        node.trailingClosure?.leftBrace,
+        tokens: .space
+      )
+    } else {
+      before(
+        node.trailingClosure?.leftBrace,
+        tokens: .break(.same, newlines: .elective(ignoresDiscretionary: false))
+      )
+    }
 
     arrangeFunctionCallArgumentList(
       arguments,
       leftDelimiter: node.leftParen,
       rightDelimiter: node.rightParen,
-      forcesBreakBeforeRightDelimiter: breakBeforeRightParen)
+      forcesBreakBeforeRightDelimiter: breakBeforeRightParen
+    )
 
     return .visitChildren
   }
@@ -959,10 +971,11 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
     if !arguments.isEmpty {
       var afterLeftDelimiter: [Token] = [.break(.open, size: 0)]
       var beforeRightDelimiter: [Token] = [
-        .break(.close(mustBreak: forcesBreakBeforeRightDelimiter), size: 0),
+        .break(.close(mustBreak: forcesBreakBeforeRightDelimiter), size: 0)
       ]
 
       if shouldGroupAroundArgumentList(arguments) {
+
         afterLeftDelimiter.append(.open(argumentListConsistency()))
         beforeRightDelimiter.append(.close)
       }
@@ -1071,7 +1084,7 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
           // Since the output clause is optional but the in-token is required, placing the .close
           // before `inTok` ensures the close gets into the token stream.
           before(node.inTok, tokens: .close)
-        } else  {
+        } else {
           // Group outside of the parens, so that the argument list together, preferring to break
           // between the argument list and the output.
           before(input.firstToken, tokens: .open)
@@ -2042,8 +2055,9 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
       // zero or more whitespace that indicates the amount of whitespace stripped from each line of
       // the string literal.
       if let lastSegment = node.segments.last?.as(StringSegmentSyntax.self),
-        let lastLine
-          = lastSegment.content.text.split(separator: "\n", omittingEmptySubsequences: false).last
+        let lastLine = lastSegment.content.text.split(
+          separator: "\n", omittingEmptySubsequences: false
+        ).last
       {
         let prefixCount = lastLine.count
 
@@ -2591,16 +2605,32 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
     openBraceNewlineBehavior: NewlineBehavior = .elective
   ) where BodyContents.Element: SyntaxProtocol {
     guard let node = node, let contentsKeyPath = contentsKeyPath else { return }
-
-    if shouldResetBeforeLeftBrace {
+    if config.respectsCompactFunctions,
+      (node as? ClosureExprSyntax)?.startsWithImpicitArgument == true
+    {
+      after(node.leftBrace, tokens: .space)
+      return
+    } else if shouldResetBeforeLeftBrace {
       before(
         node.leftBrace,
-        tokens: .break(.reset, size: 1, newlines: .elective(ignoresDiscretionary: true)))
+        tokens: .break(.reset, size: 1, newlines: .elective(ignoresDiscretionary: true))
+      )
     }
     if !areBracesCompletelyEmpty(node, contentsKeyPath: contentsKeyPath) {
       after(
-        node.leftBrace, tokens: .break(.open, size: 1, newlines: openBraceNewlineBehavior), .open)
-      before(node.rightBrace, tokens: .break(.close, size: 1), .close)
+        node.leftBrace,
+        tokens: [
+          .break(.open, size: 1, newlines: openBraceNewlineBehavior),
+          .open,
+        ]
+      )
+      before(
+        node.rightBrace,
+        tokens: [
+          .break(.close, size: 1),
+          .close,
+        ]
+      )
     } else {
       after(node.leftBrace, tokens: .break(.open, size: 0, newlines: openBraceNewlineBehavior))
       before(node.rightBrace, tokens: .break(.close, size: 0))
@@ -2723,7 +2753,8 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
           // There must be a break with a soft newline after the comment, but it's impossible to
           // know which kind of break must be used. Adding this newline is deferred until the
           // comment is added to the token stream.
-      ])
+        ]
+      )
 
     case .blockComment(let text):
       return (
@@ -2838,8 +2869,8 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
       case .newlines(let count), .carriageReturns(let count), .carriageReturnLineFeeds(let count):
         guard !isStartOfFile else { break }
 
-        if requiresNextNewline ||
-          (config.respectsExistingLineBreaks && isDiscretionaryNewlineAllowed(before: token))
+        if requiresNextNewline
+          || (config.respectsExistingLineBreaks && isDiscretionaryNewlineAllowed(before: token))
         {
           appendNewlines(.soft(count: count, discretionary: true))
         } else {
@@ -3038,8 +3069,11 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
     guard argumentList.count == 1 else { return false }
 
     let expression = argumentList.first!.expression
+    let isCompactFunctionCall =
+      config.respectsCompactFunctions
+      && expression.as(FunctionCallExprSyntax.self)?.trailingClosure != nil
     return expression.is(ArrayExprSyntax.self) || expression.is(DictionaryExprSyntax.self)
-      || expression.is(ClosureExprSyntax.self)
+      || expression.is(ClosureExprSyntax.self) || isCompactFunctionCall
   }
 
   /// Returns a value indicating whether a statement or member declaration should have a newline
@@ -3327,8 +3361,9 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
       // When the member access is part of a calling expression, the break before the dot is
       // inserted when visiting the parent node instead so that the break is inserted before any
       // scoping tokens (e.g. `contextualBreakingStart`, `open`).
-      if memberAccessExpr.base != nil &&
-          expr.parent?.isProtocol(CallingExprSyntaxProtocol.self) != true {
+      if memberAccessExpr.base != nil
+        && expr.parent?.isProtocol(CallingExprSyntaxProtocol.self) != true
+      {
         before(memberAccessExpr.dot, tokens: .break(.contextual, size: 0))
       }
       var hasCompoundExpression = false
@@ -3388,8 +3423,9 @@ extension Syntax {
     let folded = SequenceExprFoldingRewriter(operatorContext: operatorContext).visit(self)
     let commentsMoved = CommentMovingRewriter().visit(folded)
     return TokenStreamCreator(
-      configuration: configuration, operatorContext: operatorContext)
-      .makeStream(from: commentsMoved)
+      configuration: configuration,
+      operatorContext: operatorContext
+    ).makeStream(from: commentsMoved)
   }
 }
 
@@ -3520,12 +3556,12 @@ extension TriviaPiece {
 ///   - trivia: Leading trivia for a node that the formatter supports ignoring.
 ///   - isWholeFile: Whether to search for a whole-file ignore directive or per node ignore.
 /// - Returns: Whether the trivia contains the specified type of ignore directive.
-fileprivate func isFormatterIgnorePresent(inTrivia trivia: Trivia, isWholeFile: Bool) -> Bool {
+private func isFormatterIgnorePresent(inTrivia trivia: Trivia, isWholeFile: Bool) -> Bool {
   func isFormatterIgnore(in commentText: String, prefix: String, suffix: String) -> Bool {
     let trimmed =
       commentText.dropFirst(prefix.count)
-        .dropLast(suffix.count)
-        .trimmingCharacters(in: .whitespaces)
+      .dropLast(suffix.count)
+      .trimmingCharacters(in: .whitespaces)
     let pattern = isWholeFile ? "swift-format-ignore-file" : "swift-format-ignore"
     return trimmed == pattern
   }
@@ -3553,7 +3589,7 @@ fileprivate func isFormatterIgnorePresent(inTrivia trivia: Trivia, isWholeFile: 
 /// be safely ignored.
 ///
 /// - Parameter node: A node that can be safely ignored.
-fileprivate func shouldFormatterIgnore(node: Syntax) -> Bool {
+private func shouldFormatterIgnore(node: Syntax) -> Bool {
   // Regardless of the level of nesting, if the ignore directive is present on the first token
   // contained within the node then the entire node is eligible for ignoring.
   if let firstTrivia = node.firstToken?.leadingTrivia {
@@ -3567,7 +3603,7 @@ fileprivate func shouldFormatterIgnore(node: Syntax) -> Bool {
 /// in the original source).
 ///
 /// - Parameter file: The root syntax node for a source file.
-fileprivate func shouldFormatterIgnore(file: SourceFileSyntax) -> Bool {
+private func shouldFormatterIgnore(file: SourceFileSyntax) -> Bool {
   if let firstTrivia = file.firstToken?.leadingTrivia {
     return isFormatterIgnorePresent(inTrivia: firstTrivia, isWholeFile: true)
   }
@@ -3575,7 +3611,7 @@ fileprivate func shouldFormatterIgnore(file: SourceFileSyntax) -> Bool {
 }
 
 extension NewlineBehavior {
-  static func +(lhs: NewlineBehavior, rhs: NewlineBehavior) -> NewlineBehavior {
+  static func + (lhs: NewlineBehavior, rhs: NewlineBehavior) -> NewlineBehavior {
     switch (lhs, rhs) {
     case (.elective, _):
       // `rhs` is either also elective or a required newline, which overwrites elective.
@@ -3612,8 +3648,8 @@ protocol CallingExprSyntaxProtocol: ExprSyntaxProtocol {
   var calledExpression: ExprSyntax { get }
 }
 
-extension FunctionCallExprSyntax: CallingExprSyntaxProtocol { }
-extension SubscriptExprSyntax: CallingExprSyntaxProtocol { }
+extension FunctionCallExprSyntax: CallingExprSyntaxProtocol {}
+extension SubscriptExprSyntax: CallingExprSyntaxProtocol {}
 
 extension Syntax {
   func asProtocol(_: CallingExprSyntaxProtocol.Protocol) -> CallingExprSyntaxProtocol? {
@@ -3630,5 +3666,26 @@ extension ExprSyntax {
   }
   func isProtocol(_: CallingExprSyntaxProtocol.Protocol) -> Bool {
     return self.asProtocol(CallingExprSyntaxProtocol.self) != nil
+  }
+}
+
+extension ClosureExprSyntax {
+  var startsWithImpicitArgument: Bool {
+    let children =
+      children.dropFirst()
+      .first?.children
+      .flatMap(\.children)
+      .flatMap(\.children)
+      .flatMap(\.children)
+    if var iterator = children?.makeIterator(),
+      let first = iterator.next()?.description,
+      first == "$0",
+      let second = iterator.next()?.description,
+      second.contains("\n") && second.contains(".") == true
+    {
+      return true
+    } else {
+      return false
+    }
   }
 }

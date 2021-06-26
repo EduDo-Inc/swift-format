@@ -17,10 +17,12 @@ let sourcesDirectory = URL(fileURLWithPath: #file)
   .deletingLastPathComponent()
   .deletingLastPathComponent()
 let rulesDirectory = sourcesDirectory.appendingPathComponent("SwiftFormatRules")
-let pipelineFile = sourcesDirectory
+let pipelineFile =
+  sourcesDirectory
   .appendingPathComponent("SwiftFormat")
   .appendingPathComponent("Pipelines+Generated.swift")
-let ruleRegistryFile = sourcesDirectory
+let ruleRegistryFile =
+  sourcesDirectory
   .appendingPathComponent("SwiftFormatConfiguration")
   .appendingPathComponent("RuleRegistry+Generated.swift")
 

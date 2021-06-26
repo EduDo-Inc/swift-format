@@ -96,11 +96,13 @@ public final class DoNotUseSemicolons: SyntaxFormatRule {
   }
 
   public override func visit(_ node: CodeBlockItemListSyntax) -> Syntax {
-    return Syntax(nodeByRemovingSemicolons(from: node, nodeCreator: SyntaxFactory.makeCodeBlockItemList))
+    return Syntax(
+      nodeByRemovingSemicolons(from: node, nodeCreator: SyntaxFactory.makeCodeBlockItemList))
   }
 
   public override func visit(_ node: MemberDeclListSyntax) -> Syntax {
-    return Syntax(nodeByRemovingSemicolons(from: node, nodeCreator: SyntaxFactory.makeMemberDeclList))
+    return Syntax(
+      nodeByRemovingSemicolons(from: node, nodeCreator: SyntaxFactory.makeMemberDeclList))
   }
 }
 

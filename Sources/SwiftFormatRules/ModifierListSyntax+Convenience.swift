@@ -65,7 +65,8 @@ extension ModifierListSyntax {
     var newModifiers: [DeclModifierSyntax] = []
     newModifiers.append(contentsOf: self)
 
-    let modifier = formatTrivia
+    let modifier =
+      formatTrivia
       ? replaceTrivia(
         on: modifier,
         token: modifier.name,

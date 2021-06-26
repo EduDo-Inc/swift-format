@@ -45,28 +45,33 @@ public final class AllPublicDeclarationsHaveDocumentation: SyntaxLintRule {
   }
 
   public override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
-    diagnoseMissingDocComment(DeclSyntax(node), name: node.identifier.text, modifiers: node.modifiers)
+    diagnoseMissingDocComment(
+      DeclSyntax(node), name: node.identifier.text, modifiers: node.modifiers)
     return .skipChildren
   }
 
   public override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
     guard let mainBinding = node.bindings.firstAndOnly else { return .skipChildren }
-    diagnoseMissingDocComment(DeclSyntax(node), name: "\(mainBinding.pattern)", modifiers: node.modifiers)
+    diagnoseMissingDocComment(
+      DeclSyntax(node), name: "\(mainBinding.pattern)", modifiers: node.modifiers)
     return .skipChildren
   }
 
   public override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
-    diagnoseMissingDocComment(DeclSyntax(node), name: node.identifier.text, modifiers: node.modifiers)
+    diagnoseMissingDocComment(
+      DeclSyntax(node), name: node.identifier.text, modifiers: node.modifiers)
     return .skipChildren
   }
 
   public override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
-    diagnoseMissingDocComment(DeclSyntax(node), name: node.identifier.text, modifiers: node.modifiers)
+    diagnoseMissingDocComment(
+      DeclSyntax(node), name: node.identifier.text, modifiers: node.modifiers)
     return .skipChildren
   }
 
   public override func visit(_ node: TypealiasDeclSyntax) -> SyntaxVisitorContinueKind {
-    diagnoseMissingDocComment(DeclSyntax(node), name: node.identifier.text, modifiers: node.modifiers)
+    diagnoseMissingDocComment(
+      DeclSyntax(node), name: node.identifier.text, modifiers: node.modifiers)
     return .skipChildren
   }
 

@@ -14,7 +14,7 @@ import Foundation
 
 /// A version number that can be specified in the configuration file, which allows us to change the
 /// format in the future if desired and still support older files.
-fileprivate let highestSupportedConfigurationVersion = 1
+private let highestSupportedConfigurationVersion = 1
 
 /// Holds the complete set of configured values and defaults.
 public struct Configuration: Codable, Equatable {
@@ -26,6 +26,7 @@ public struct Configuration: Codable, Equatable {
     case tabWidth
     case indentation
     case respectsExistingLineBreaks
+    case respectsCompactFunctions
     case lineBreakBeforeControlFlowKeywords
     case lineBreakBeforeEachArgument
     case lineBreakBeforeEachGenericRequirement
@@ -70,6 +71,39 @@ public struct Configuration: Codable, Equatable {
   /// true, those line breaks will be kept. If this setting is false, the formatter will act more
   /// "opinionated" and collapse the statement onto a single line.
   public var respectsExistingLineBreaks = true
+
+  /// Indicates that the formatter should try to respect user formatted compact functions.
+  ///
+  /// Compact function here is a call of a function or a declaration of a closure which starts with an
+  /// implicit argument or the only argument passed to a function is another function with a trailing closure parameter
+  /// For example this calls will stay the same
+  /// ```
+  /// functionCall { $0
+  ///   .otherCall()
+  ///   .anotherCall()
+  /// }
+  ///
+  /// publisher
+  ///   .sink(capture { _self, value in
+  ///     print(_self, value)
+  ///   })
+  /// ```
+  /// instead of formatting them as
+  /// ```
+  /// functionCall {
+  ///   $0
+  ///     .otherCall()
+  ///     .anotherCall()
+  /// }
+  ///
+  /// publisher
+  ///   .sink(
+  ///      capture { _self, value in
+  ///        print(_self, value)
+  ///      }
+  ///    )
+  /// ```
+  public var respectsCompactFunctions = true
 
   /// MARK: Rule-specific configuration
 
@@ -173,24 +207,28 @@ public struct Configuration: Codable, Equatable {
     // If we ever introduce a new version, this is where we should switch on the decoded version
     // number and dispatch to different decoding methods.
 
-    self.maximumBlankLines
-      = try container.decodeIfPresent(Int.self, forKey: .maximumBlankLines) ?? 1
+    self.maximumBlankLines =
+      try container.decodeIfPresent(Int.self, forKey: .maximumBlankLines) ?? 1
     self.lineLength = try container.decodeIfPresent(Int.self, forKey: .lineLength) ?? 100
     self.tabWidth = try container.decodeIfPresent(Int.self, forKey: .tabWidth) ?? 8
-    self.indentation
-      = try container.decodeIfPresent(Indent.self, forKey: .indentation) ?? .spaces(2)
-    self.respectsExistingLineBreaks
-      = try container.decodeIfPresent(Bool.self, forKey: .respectsExistingLineBreaks) ?? true
-    self.lineBreakBeforeControlFlowKeywords
-      = try container.decodeIfPresent(Bool.self, forKey: .lineBreakBeforeControlFlowKeywords) ?? false
-    self.lineBreakBeforeEachArgument
-      = try container.decodeIfPresent(Bool.self, forKey: .lineBreakBeforeEachArgument) ?? false
-    self.lineBreakBeforeEachGenericRequirement
-      = try container.decodeIfPresent(Bool.self, forKey: .lineBreakBeforeEachGenericRequirement) ?? false
-    self.prioritizeKeepingFunctionOutputTogether
-      = try container.decodeIfPresent(Bool.self, forKey: .prioritizeKeepingFunctionOutputTogether) ?? false
-    self.indentConditionalCompilationBlocks
-      = try container.decodeIfPresent(Bool.self, forKey: .indentConditionalCompilationBlocks) ?? true
+    self.indentation =
+      try container.decodeIfPresent(Indent.self, forKey: .indentation) ?? .spaces(2)
+    self.respectsExistingLineBreaks =
+      try container.decodeIfPresent(Bool.self, forKey: .respectsExistingLineBreaks) ?? true
+    self.respectsCompactFunctions =
+      try container.decodeIfPresent(Bool.self, forKey: .respectsCompactFunctions) ?? true
+    self.lineBreakBeforeControlFlowKeywords =
+      try container.decodeIfPresent(Bool.self, forKey: .lineBreakBeforeControlFlowKeywords) ?? false
+    self.lineBreakBeforeEachArgument =
+      try container.decodeIfPresent(Bool.self, forKey: .lineBreakBeforeEachArgument) ?? false
+    self.lineBreakBeforeEachGenericRequirement =
+      try container.decodeIfPresent(Bool.self, forKey: .lineBreakBeforeEachGenericRequirement)
+      ?? false
+    self.prioritizeKeepingFunctionOutputTogether =
+      try container.decodeIfPresent(Bool.self, forKey: .prioritizeKeepingFunctionOutputTogether)
+      ?? false
+    self.indentConditionalCompilationBlocks =
+      try container.decodeIfPresent(Bool.self, forKey: .indentConditionalCompilationBlocks) ?? true
     self.lineBreakAroundMultilineExpressionChainComponents =
       try container.decodeIfPresent(
         Bool.self, forKey: .lineBreakAroundMultilineExpressionChainComponents) ?? false
@@ -198,15 +236,15 @@ public struct Configuration: Codable, Equatable {
       try container.decodeIfPresent(
         FileScopedDeclarationPrivacyConfiguration.self, forKey: .fileScopedDeclarationPrivacy)
       ?? FileScopedDeclarationPrivacyConfiguration()
-    self.indentSwitchCaseLabels
-      = try container.decodeIfPresent(Bool.self, forKey: .indentSwitchCaseLabels) ?? false
+    self.indentSwitchCaseLabels =
+      try container.decodeIfPresent(Bool.self, forKey: .indentSwitchCaseLabels) ?? false
 
     // If the `rules` key is not present at all, default it to the built-in set
     // so that the behavior is the same as if the configuration had been
     // default-initialized. To get an empty rules dictionary, one can explicitly
     // set the `rules` key to `{}`.
-    self.rules
-      = try container.decodeIfPresent([String: Bool].self, forKey: .rules) ?? RuleRegistry.rules
+    self.rules =
+      try container.decodeIfPresent([String: Bool].self, forKey: .rules) ?? RuleRegistry.rules
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -218,11 +256,16 @@ public struct Configuration: Codable, Equatable {
     try container.encode(tabWidth, forKey: .tabWidth)
     try container.encode(indentation, forKey: .indentation)
     try container.encode(respectsExistingLineBreaks, forKey: .respectsExistingLineBreaks)
-    try container.encode(lineBreakBeforeControlFlowKeywords, forKey: .lineBreakBeforeControlFlowKeywords)
+    try container.encode(respectsCompactFunctions, forKey: .respectsCompactFunctions)
+    try container.encode(
+      lineBreakBeforeControlFlowKeywords, forKey: .lineBreakBeforeControlFlowKeywords)
     try container.encode(lineBreakBeforeEachArgument, forKey: .lineBreakBeforeEachArgument)
-    try container.encode(lineBreakBeforeEachGenericRequirement, forKey: .lineBreakBeforeEachGenericRequirement)
-    try container.encode(prioritizeKeepingFunctionOutputTogether, forKey: .prioritizeKeepingFunctionOutputTogether)
-    try container.encode(indentConditionalCompilationBlocks, forKey: .indentConditionalCompilationBlocks)
+    try container.encode(
+      lineBreakBeforeEachGenericRequirement, forKey: .lineBreakBeforeEachGenericRequirement)
+    try container.encode(
+      prioritizeKeepingFunctionOutputTogether, forKey: .prioritizeKeepingFunctionOutputTogether)
+    try container.encode(
+      indentConditionalCompilationBlocks, forKey: .indentConditionalCompilationBlocks)
     try container.encode(
       lineBreakAroundMultilineExpressionChainComponents,
       forKey: .lineBreakAroundMultilineExpressionChainComponents)
@@ -236,8 +279,9 @@ public struct Configuration: Codable, Equatable {
     var path = url.absoluteURL
     let configFilename = ".swift-format"
     var isDirectory: ObjCBool = false
-    if FileManager.default.fileExists(atPath: path.path, isDirectory: &isDirectory), 
-      isDirectory.boolValue {
+    if FileManager.default.fileExists(atPath: path.path, isDirectory: &isDirectory),
+      isDirectory.boolValue
+    {
       // will be deleted in a loop
       path.appendPathComponent("placeholder")
     }

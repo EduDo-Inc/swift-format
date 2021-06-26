@@ -40,7 +40,8 @@ public final class UseShorthandTypeNames: SyntaxFormatRule {
 
     // Ensure that all arguments in the clause are shortened and in the expected format by visiting
     // the argument list, first.
-    let genericArgumentList = visit(genericArgumentClause.arguments).as(GenericArgumentListSyntax.self)!
+    let genericArgumentList = visit(genericArgumentClause.arguments).as(
+      GenericArgumentListSyntax.self)!
 
     let (leadingTrivia, trailingTrivia) = boundaryTrivia(around: Syntax(node))
     let newNode: TypeSyntax?
@@ -276,7 +277,7 @@ public final class UseShorthandTypeNames: SyntaxFormatRule {
     return SyntaxFactory.makeArrayExpr(
       leftSquare: leftSquareBracket,
       elements: SyntaxFactory.makeArrayElementList([
-        SyntaxFactory.makeArrayElement(expression: elementTypeExpr, trailingComma: nil),
+        SyntaxFactory.makeArrayElement(expression: elementTypeExpr, trailingComma: nil)
       ]),
       rightSquare: rightSquareBracket)
   }
@@ -302,7 +303,7 @@ public final class UseShorthandTypeNames: SyntaxFormatRule {
         keyExpression: keyTypeExpr,
         colon: colon,
         valueExpression: valueTypeExpr,
-        trailingComma: nil),
+        trailingComma: nil)
     ])
     return SyntaxFactory.makeDictionaryExpr(
       leftSquare: leftSquareBracket,
@@ -366,7 +367,8 @@ public final class UseShorthandTypeNames: SyntaxFormatRule {
       // the identifier and the generic arguments. Otherwise, we can return just the
       // `IdentifierExpr` itself.
       if let genericArgumentClause = simpleTypeIdentifier.genericArgumentClause {
-        let newGenericArgumentClause = visit(genericArgumentClause).as(GenericArgumentClauseSyntax.self)!
+        let newGenericArgumentClause = visit(genericArgumentClause).as(
+          GenericArgumentClauseSyntax.self)!
         let result = SyntaxFactory.makeSpecializeExpr(
           expression: ExprSyntax(identifierExpr),
           genericArgumentClause: newGenericArgumentClause)

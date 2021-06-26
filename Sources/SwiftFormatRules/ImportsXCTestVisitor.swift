@@ -14,7 +14,7 @@ import SwiftFormatCore
 import SwiftSyntax
 
 /// Visitor that determines if the target source file imports XCTest
-fileprivate class ImportsXCTestVisitor: SyntaxVisitor {
+private class ImportsXCTestVisitor: SyntaxVisitor {
   private let context: Context
 
   init(context: Context) {

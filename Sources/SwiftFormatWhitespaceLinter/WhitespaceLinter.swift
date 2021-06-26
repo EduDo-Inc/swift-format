@@ -318,8 +318,9 @@ public class WhitespaceLinter {
   private func contiguousWhitespace(startingAt offset: Int, in data: [UTF8.CodeUnit])
     -> ArraySlice<UTF8.CodeUnit>
   {
-    guard let whitespaceEnd =
-      data[offset...].firstIndex(where: { !UnicodeScalar($0).properties.isWhitespace })
+    guard
+      let whitespaceEnd =
+        data[offset...].firstIndex(where: { !UnicodeScalar($0).properties.isWhitespace })
     else {
       return data[offset..<data.endIndex]
     }

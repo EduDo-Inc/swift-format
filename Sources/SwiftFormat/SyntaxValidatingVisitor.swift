@@ -13,7 +13,7 @@
 import SwiftSyntax
 
 /// A SyntaxVisitor that searches for nodes that cannot be handled safely.
-fileprivate class SyntaxValidatingVisitor: SyntaxVisitor {
+private class SyntaxValidatingVisitor: SyntaxVisitor {
   /// Stores the start position of the first node that contains invalid syntax.
   var invalidSyntaxStartPosition: AbsolutePosition?
 

@@ -12,7 +12,7 @@ final class FunctionCallTests: PrettyPrintTestCase {
       let a = myFunc(var1, var2, var3, var4, var5, var6, var7, x)
       let a = myFunc(var1: 123, var2: someFun(var1: "abc", var2: 123, var3: Bool, var4: 1.23))
       """
-
+    
     let expected =
       """
       let a = myFunc()
@@ -51,14 +51,14 @@ final class FunctionCallTests: PrettyPrintTestCase {
           var4: 1.23
         )
       )
-
+      
       """
-
+    
     var config = Configuration()
     config.lineBreakBeforeEachArgument = true
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 45, configuration: config)
   }
-
+  
   func testBasicFunctionCalls_packArguments() {
     let input =
       """
@@ -70,7 +70,7 @@ final class FunctionCallTests: PrettyPrintTestCase {
       let a = myFunc(var1, var2, var3, var4, var5, var6, var7, x)
       let a = myFunc(var1: 123, var2: someFun(var1: "abc", var2: 123, var3: Bool, var4: 1.23))
       """
-
+    
     let expected =
       """
       let a = myFunc()
@@ -89,14 +89,14 @@ final class FunctionCallTests: PrettyPrintTestCase {
         var2: someFun(
           var1: "abc", var2: 123, var3: Bool,
           var4: 1.23))
-
+      
       """
-
+    
     var config = Configuration()
     config.lineBreakBeforeEachArgument = false
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 45, configuration: config)
   }
-
+  
   func testDiscretionaryLineBreakBeforeClosingParenthesis() {
     let input =
       """
@@ -107,7 +107,7 @@ final class FunctionCallTests: PrettyPrintTestCase {
       """
     assertPrettyPrintEqual(input: input, expected: input + "\n", linelength: 45)
   }
-
+  
   func testDiscretionaryLineBreaksAreSelfCorrecting() {
     // A discretionary line break should never permit a violation of the rule that says,
     // effectively, "if a closing delimiter does not fit on the same line as its matching open
@@ -119,19 +119,19 @@ final class FunctionCallTests: PrettyPrintTestCase {
       let a = myFunc(var1: 123, var2: "abc"
       )
       """
-
+    
     let expected =
       """
       let a = myFunc(
         var1: 123, var2: "abc"
       )
-
+      
       """
     var config = Configuration()
     config.lineBreakBeforeEachArgument = false
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 45, configuration: config)
   }
-
+  
   func testArgumentStartsWithOpenDelimiter() {
     let input =
       """
@@ -149,7 +149,7 @@ final class FunctionCallTests: PrettyPrintTestCase {
       myFunc(someArray: [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]) { foo in bar() }
       myFunc(someArray: [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]) { foo in someMuchLongerLineBreakingBarFunction() }
       """
-
+    
     let expected =
       """
       myFunc(someArray: [])
@@ -178,12 +178,12 @@ final class FunctionCallTests: PrettyPrintTestCase {
       ]) { foo in
         someMuchLongerLineBreakingBarFunction()
       }
-
+      
       """
-
+    
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 45)
   }
-
+  
   func testSingleUnlabeledArgumentWithDelimiters() {
     let input =
       """
@@ -193,7 +193,7 @@ final class FunctionCallTests: PrettyPrintTestCase {
       myFunc([1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]) { foo in bar() }
       myFunc([1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]) { foo in someMuchLongerLineBreakingBarFunction() }
       """
-
+    
     let expected =
       """
       myFunc([
@@ -217,29 +217,29 @@ final class FunctionCallTests: PrettyPrintTestCase {
       ]) { foo in
         someMuchLongerLineBreakingBarFunction()
       }
-
+      
       """
-
+    
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 45)
   }
-
+  
   func testNestedFunctionCallExprSequences() {
     let input =
       """
       let result = firstObj.someOptionalReturningFunc(foo: arg) ?? (someOtherObj as SomeUsefulType).someGetterFunc()
       """
-
+    
     let expected =
       """
       let result =
         firstObj.someOptionalReturningFunc(foo: arg)
         ?? (someOtherObj as SomeUsefulType).someGetterFunc()
-
+      
       """
-
+    
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 60)
   }
-
+  
   func testDiscretionaryLineBreakAfterColon() {
     let input =
       """
@@ -253,7 +253,7 @@ final class FunctionCallTests: PrettyPrintTestCase {
           Very.Deeply.Nested.Member
       )
       """
-
+    
     let expected =
       """
       myFunc(
@@ -267,12 +267,12 @@ final class FunctionCallTests: PrettyPrintTestCase {
           Very.Deeply
           .Nested.Member
       )
-
+      
       """
-
+    
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 20)
   }
-
+  
   func testDiscretionaryLineBreakBeforeTrailingClosure() {
     let input =
       """
@@ -294,7 +294,7 @@ final class FunctionCallTests: PrettyPrintTestCase {
         blah()
       }
       """
-
+    
     let expected =
       """
       foo(a, b, c) {
@@ -316,12 +316,12 @@ final class FunctionCallTests: PrettyPrintTestCase {
       {
         blah()
       }
-
+      
       """
-
+    
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 20)
   }
-
+  
   func testGroupsTrailingComma() {
     let input =
       """
@@ -329,7 +329,7 @@ final class FunctionCallTests: PrettyPrintTestCase {
         image: useLongName ? image(named: .longNameImage) : image(named: .veryLongNameImageZ),
         bar: bar)
       """
-
+    
     let expected =
       """
       foo(
@@ -337,12 +337,12 @@ final class FunctionCallTests: PrettyPrintTestCase {
           ? image(named: .longNameImage)
           : image(named: .veryLongNameImageZ),
         bar: bar)
-
+      
       """
-
+    
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 70)
   }
-
+  
   func testMultipleTrailingClosures() {
     let input =
       """
@@ -351,7 +351,7 @@ final class FunctionCallTests: PrettyPrintTestCase {
       let a = foo { b in b } c: { d in d }
       let a = foo { abcdefg in b } c: { d in d }
       """
-
+    
     let expected =
       """
       a = f {
@@ -375,9 +375,91 @@ final class FunctionCallTests: PrettyPrintTestCase {
       } c: { d in
         d
       }
-
+      
       """
-
+    
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 23)
+  }
+  
+  func testUnnamedArgument() {
+    let input =
+      """
+      { $0
+        .otherCall(a, b)
+      }
+      """
+    
+    let expected =
+      """
+      { $0
+        .otherCall(a, b)
+      }
+      
+      """
+    
+    assertPrettyPrintEqual(input: input, expected: expected, linelength: 40)
+  }
+  
+  func testUnnamedArgumentFunctionCall() {
+    let input =
+      """
+      someFunction { $0
+        .otherCall(a, b)
+      }
+      """
+    
+    let expected =
+      """
+      someFunction { $0
+        .otherCall(a, b)
+      }
+      
+      """
+    
+    assertPrettyPrintEqual(input: input, expected: expected, linelength: 40)
+  }
+  
+  func testCompactFunctionArgument() {
+    let input =
+      """
+        publisher
+          .sink(capture { _self, param in
+            print($0)
+          })
+        """
+    
+    let expected =
+      """
+        publisher
+          .sink(capture { _self, param in
+            print($0)
+          })
+
+        """
+    
+    assertPrettyPrintEqual(input: input, expected: expected, linelength: 40)
+  }
+  
+  func testExtendedCompactFunctionArgument() {
+    let input =
+      """
+        publisher
+          .map(capture(or: 10) { _self, param in
+            return _self.multiplier + param
+          })
+          .sink { print($0) }
+        """
+    
+    let expected =
+      """
+        publisher
+          .map(capture(or: 10) { _self, param in
+            return _self.multiplier + param
+          })
+          .sink { print($0) }
+
+        """
+    
+    assertPrettyPrintEqual(input: input, expected: expected, linelength: 100)
   }
 }

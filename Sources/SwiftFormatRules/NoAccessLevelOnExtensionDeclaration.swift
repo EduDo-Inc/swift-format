@@ -38,8 +38,8 @@ public final class NoAccessLevelOnExtensionDeclaration: SyntaxFormatRule {
       // we have to update the keyword to ensure that the result is correct.
       let accessKeywordToAdd: DeclModifierSyntax
       if keywordKind == .privateKeyword {
-        accessKeywordToAdd
-          = accessKeyword.withName(accessKeyword.name.withKind(.fileprivateKeyword))
+        accessKeywordToAdd = accessKeyword.withName(
+          accessKeyword.name.withKind(.fileprivateKeyword))
       } else {
         accessKeywordToAdd = accessKeyword
       }

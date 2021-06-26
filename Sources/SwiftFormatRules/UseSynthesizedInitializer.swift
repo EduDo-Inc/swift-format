@@ -67,7 +67,8 @@ public final class UseSynthesizedInitializer: SyntaxLintRule {
     // The synthesized memberwise initializer(s) are only created when there are no initializers.
     // If there are other initializers that cannot be replaced by a synthesized memberwise
     // initializer, then all of the initializers must remain.
-    let initializersCount = node.members.members.filter { $0.decl.is(InitializerDeclSyntax.self) }.count
+    let initializersCount = node.members.members.filter { $0.decl.is(InitializerDeclSyntax.self) }
+      .count
     if extraneousInitializers.count == initializersCount {
       extraneousInitializers.forEach { diagnose(.removeRedundantInitializer, on: $0) }
     }
@@ -127,7 +128,9 @@ public final class UseSynthesizedInitializer: SyntaxLintRule {
       if propertyId.identifier.text != paramId.text
         || propertyType.description.trimmingCharacters(
           in: .whitespaces) != paramType.description.trimmingCharacters(in: .whitespacesAndNewlines)
-      { return false }
+      {
+        return false
+      }
     }
     return true
   }
@@ -184,7 +187,7 @@ extension Diagnostic.Message {
 }
 
 /// Defines the access levels which may be assigned to a synthesized memberwise initializer.
-fileprivate enum AccessLevel {
+private enum AccessLevel {
   case `internal`
   case `fileprivate`
   case `private`
@@ -199,16 +202,16 @@ fileprivate enum AccessLevel {
 ///
 /// - Parameter properties: The properties contained within the struct.
 /// - Returns: The synthesized memberwise initializer's access level.
-fileprivate func synthesizedInitAccessLevel(using properties: [VariableDeclSyntax]) -> AccessLevel {
+private func synthesizedInitAccessLevel(using properties: [VariableDeclSyntax]) -> AccessLevel {
   var hasFileprivate = false
   for property in properties {
     guard let modifiers = property.modifiers else { continue }
 
     // Private takes precedence, so finding 1 private property defines the access level.
-    if modifiers.contains(where: {$0.name.tokenKind == .privateKeyword && $0.detail == nil}) {
+    if modifiers.contains(where: { $0.name.tokenKind == .privateKeyword && $0.detail == nil }) {
       return .private
     }
-    if modifiers.contains(where: {$0.name.tokenKind == .fileprivateKeyword && $0.detail == nil}) {
+    if modifiers.contains(where: { $0.name.tokenKind == .fileprivateKeyword && $0.detail == nil }) {
       hasFileprivate = true
       // Can't break here because a later property might be private.
     }

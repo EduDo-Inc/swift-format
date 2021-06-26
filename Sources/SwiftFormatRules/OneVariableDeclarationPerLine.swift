@@ -205,4 +205,3 @@ private struct VariableDeclSplitter<Node: SyntaxProtocol> {
     bindingQueue = []
   }
 }
-

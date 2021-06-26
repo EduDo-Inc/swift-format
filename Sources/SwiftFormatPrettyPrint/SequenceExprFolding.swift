@@ -138,8 +138,9 @@ extension SequenceExprSyntax {
     var lhs = lhs
 
     // Extract the first operator.
-    guard var op1 = peekNextOperator(
-      in: rest, context: context, shouldConsider: shouldConsider)
+    guard
+      var op1 = peekNextOperator(
+        in: rest, context: context, shouldConsider: shouldConsider)
     else {
       return lhs
     }
@@ -158,8 +159,9 @@ extension SequenceExprSyntax {
         lhs = makeExpression(
           operator: op1.operatorExpr, lhs: lhs, rhs: rhs, context: context)
 
-        guard let maybeOp = peekNextOperator(
-          in: rest, context: context, shouldConsider: shouldConsider)
+        guard
+          let maybeOp = peekNextOperator(
+            in: rest, context: context, shouldConsider: shouldConsider)
         else {
           return lhs
         }
@@ -212,7 +214,8 @@ extension SequenceExprSyntax {
           rest: &rest,
           context: context,
           shouldConsider: PrecedenceBound(
-            precedenceGroup: op1.precedenceGroup, isStrict: true).shouldConsider
+            precedenceGroup: op1.precedenceGroup, isStrict: true
+          ).shouldConsider
         )
         continue
       }
@@ -225,8 +228,9 @@ extension SequenceExprSyntax {
           rest: &rest,
           context: context,
           shouldConsider: PrecedenceBound(
-            precedenceGroup: op1.precedenceGroup, isStrict: false)
-              .shouldConsider)
+            precedenceGroup: op1.precedenceGroup, isStrict: false
+          )
+          .shouldConsider)
         lhs = makeExpression(
           operator: op1.operatorExpr, lhs: lhs, rhs: rhs, context: context)
 
@@ -373,7 +377,8 @@ extension SequenceExprSyntax {
       // Resolve the ternary expression by pulling the LHS and RHS that we
       // actually want into it.
 
-      let result = ternaryExpr
+      let result =
+        ternaryExpr
         .withConditionExpression(lhs)
         .withSecondChoice(rhs)
       return makeResultExpression(ExprSyntax(result))
@@ -440,7 +445,7 @@ extension SequenceExprSyntax {
 }
 
 /// A pair consisting of an infix operator expression and its precedence group.
-fileprivate struct OperatorAndPrecedence {
+private struct OperatorAndPrecedence {
 
   /// The infix operator expression.
   let operatorExpr: ExprSyntax
@@ -452,7 +457,7 @@ fileprivate struct OperatorAndPrecedence {
 
 /// Encapsulates a precedence group and strictness value for consideration
 /// during folding.
-fileprivate struct PrecedenceBound {
+private struct PrecedenceBound {
 
   /// The precedence group against which the one passed to the predicate will be
   /// compared.
