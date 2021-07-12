@@ -918,7 +918,7 @@ private final class TokenStreamCreator: SyntaxVisitor {
       (node.trailingClosure != nil && !isCompactSingleFunctionCallArgument(arguments))
       || mustBreakBeforeClosingDelimiter(of: node, argumentListPath: \.argumentList)
 
-    if config.respectsCompactFunctions, node.trailingClosure?.startsWithImpicitArgument == true {
+    if config.respectsCompactFunctions, node.trailingClosure?.isConfigurationClosure == true {
       before(
         node.trailingClosure?.leftBrace,
         tokens: .space
@@ -1050,7 +1050,8 @@ private final class TokenStreamCreator: SyntaxVisitor {
         of: node,
         contentsKeyPath: \.statements,
         shouldResetBeforeLeftBrace: false,
-        openBraceNewlineBehavior: newlineBehavior)
+        openBraceNewlineBehavior: newlineBehavior
+      )
     }
     return .visitChildren
   }
@@ -2606,7 +2607,7 @@ private final class TokenStreamCreator: SyntaxVisitor {
   ) where BodyContents.Element: SyntaxProtocol {
     guard let node = node, let contentsKeyPath = contentsKeyPath else { return }
     if config.respectsCompactFunctions,
-      (node as? ClosureExprSyntax)?.startsWithImpicitArgument == true
+      (node as? ClosureExprSyntax)?.isConfigurationClosure == true
     {
       after(node.leftBrace, tokens: .space)
       return
@@ -3670,22 +3671,7 @@ extension ExprSyntax {
 }
 
 extension ClosureExprSyntax {
-  var startsWithImpicitArgument: Bool {
-    let children =
-      children.dropFirst()
-      .first?.children
-      .flatMap(\.children)
-      .flatMap(\.children)
-      .flatMap(\.children)
-    if var iterator = children?.makeIterator(),
-      let first = iterator.next()?.description,
-      first == "$0",
-      let second = iterator.next()?.description,
-      second.contains("\n") && second.contains(".") == true
-    {
-      return true
-    } else {
-      return false
-    }
+  var isConfigurationClosure: Bool {
+    statements.firstAndOnly?.firstToken?.description == "$0"
   }
 }

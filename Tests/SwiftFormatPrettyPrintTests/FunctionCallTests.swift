@@ -400,7 +400,30 @@ final class FunctionCallTests: PrettyPrintTestCase {
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 40)
   }
   
+  
   func testUnnamedArgumentFunctionCall() {
+    let input =
+      """
+      let actual1 = TestConfigurable { $0
+        .value(true)
+        .wrapped(.init(value: 1))
+      }
+      """
+    
+    let expected =
+      """
+      let actual1 = TestConfigurable { $0
+        .value(true)
+        .wrapped(.init(value: 1))
+      }
+      
+      """
+    
+    assertPrettyPrintEqual(input: input, expected: expected, linelength: 200)
+  }
+
+  
+  func testUnnamedArgumentFunctionCall1() {
     let input =
       """
       someFunction { $0
